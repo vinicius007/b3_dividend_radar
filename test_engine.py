@@ -70,7 +70,7 @@ def test_full_pipeline():
     print(f"   📊 Proventos Trimestrais: {len(portfolios['trimestral'])} ativos -> {list(portfolios['trimestral']['ticker_clean'].values[:5])}")
 
     # 6. Testar Módulo de Gestão de Carteira e Gráficos
-    print("\n💼 6. Testando Módulo de Carteira do Investidor & Transações...")
+    print("\n[6] Testando Módulo de Carteira do Investidor & Transações...")
     txs = load_transactions()
     print(f"   • Transações carregadas: {len(txs)}")
     
@@ -80,6 +80,36 @@ def test_full_pipeline():
     print(f"   • Lucro / Prejuízo Total: R$ {summary['total_profit_loss']:+,.2f} ({summary['total_profit_loss_pct']:+.2f}%)")
     print(f"   • Proventos Anuais Estimados: R$ {summary['total_annual_dividends']:,.2f} (~ R$ {summary['total_monthly_dividends']:,.2f}/mês)")
     print(f"   • Ativos em custódia calculados: {len(summary['assets_df'])}")
+
+    # 7. Testar Sistema de Alertas de Dividendos do Mês
+    from src.data.portfolio_manager import get_portfolio_monthly_dividend_alerts, get_portfolio_dip_alerts
+    alerts = get_portfolio_monthly_dividend_alerts(summary, target_month=9)
+    print(f"\n[7] Testando Alertas de Proventos do Mês ({alerts['month_name']}):")
+    print(f"   • Ações com proventos previstos no mês: {alerts['stocks_count']}")
+    print(f"   • Total estimado a receber no mês: R$ {alerts['total_month_payout']:,.2f}")
+    for s in alerts['paying_stocks']:
+        print(f"     -> {s['ticker_clean']} ({s['name']}): R$ {s['payout_val']:,.2f} ({s['quantity']} ações)")
+
+    # 8. Testar Alertas de Ações Abaixo do Preço Médio (Preço < PM)
+    dip_alerts = get_portfolio_dip_alerts(summary, ranked_df)
+    print(f"\n[8] Testando Alertas de Ações Abaixo do Preço Médio (Preço < PM):")
+    print(f"   • Ações abaixo do valor de compra: {dip_alerts['dip_count']}")
+    print(f"   • Desconto acumulado: -R$ {dip_alerts['total_unrealized_loss']:,.2f}")
+    for d in dip_alerts['dip_stocks']:
+        print(f"     -> {d['ticker_clean']}: PM R$ {d['avg_price']:.2f} | Atual R$ {d['current_price']:.2f} ({d['diff_pct']:+.2f}%) | {d['action_badge']}")
+
+    # 9. Testar Detector de Ações < R$ 10 com Alto Potencial
+    sub10_df = ranked_df[ranked_df["price"] <= 10.0].sort_values(by="dy_12m", ascending=False)
+    print(f"\n[9] Testando Detector de Ações < R$ 10:")
+    print(f"   • Total de ativos < R$ 10 encontrados: {len(sub10_df)}")
+    for _, r in sub10_df.head(5).iterrows():
+        print(f"     -> {r['ticker_clean']} ({r['name']}): R$ {r['price']:.2f} | DY: {r['dy_12m']:.2f}% | Score: {r['score']:.1f}")
+
+    # 10. Testar Top Dividend Yields da B3
+    top_dy_df = ranked_df.sort_values(by="dy_12m", ascending=False).head(5)
+    print(f"\n[10] Testando Lista dos Maiores Dividendos em Tempo Real:")
+    for _, r in top_dy_df.iterrows():
+        print(f"     -> {r['ticker_clean']}: DY {r['dy_12m']:.2f}% | DPA R$ {r['dpa_12m']:.2f} | Teto Bazin R$ {r['bazin_target_price']:.2f}")
 
     print("\n" + "=" * 70)
     print("✨ TODOS OS TESTES PASSARAM COM SUCESSO!")

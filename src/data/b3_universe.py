@@ -60,12 +60,52 @@ B3_DIVIDEND_UNIVERSE: List[Dict[str, Any]] = [
     {
         "ticker": "BEES3.SA",
         "ticker_clean": "BEES3",
-        "name": "Banestes",
+        "name": "Banestes ON",
         "sector": "Financeiro",
         "subsector": "Bancos Regionais",
         "default_category": "mensal",
         "payout_target": 0.50,
-        "description": "Banco do Estado do Espírito Santo. Conhecido pelo pagamento mensal regular de proventos com dividend yield elevado."
+        "description": "Banco do Estado do Espírito Santo (Ações Ordinárias). Pagamento mensal regular de proventos com dividend yield elevado."
+    },
+    {
+        "ticker": "BEES4.SA",
+        "ticker_clean": "BEES4",
+        "name": "Banestes PN",
+        "sector": "Financeiro",
+        "subsector": "Bancos Regionais",
+        "default_category": "mensal",
+        "payout_target": 0.50,
+        "description": "Banco do Estado do Espírito Santo (Ações Preferenciais). Distribuição mensal recorrente de JCP/dividendos com yield atrativo."
+    },
+    {
+        "ticker": "ABCB4.SA",
+        "ticker_clean": "ABCB4",
+        "name": "Banco ABC Brasil",
+        "sector": "Financeiro",
+        "subsector": "Bancos / Middle Market",
+        "default_category": "trimestral",
+        "payout_target": 0.50,
+        "description": "Banco focado no segmento corporativo e middle-market, ROE consistente próximo a 15-17%, P/L atrativo e remuneração regular em proventos."
+    },
+    {
+        "ticker": "BRSR6.SA",
+        "ticker_clean": "BRSR6",
+        "name": "Banrisul",
+        "sector": "Financeiro",
+        "subsector": "Bancos Estaduais",
+        "default_category": "trimestral",
+        "payout_target": 0.40,
+        "description": "Banco do Estado do Rio Grande do Sul, negociando com expressivo desconto patrimonial (P/VP baixo), distribuindo proventos trimestrais via JCP."
+    },
+    {
+        "ticker": "BRAP4.SA",
+        "ticker_clean": "BRAP4",
+        "name": "Bradespar",
+        "sector": "Financeiro",
+        "subsector": "Holdings",
+        "default_category": "trimestral",
+        "payout_target": 0.85,
+        "description": "Holding de investimentos controlada pelo Bradesco com participação estratégica na Vale (VALE3). Repassa dividendos massivos de mineração aos acionistas."
     },
 
     # --- SEGUROS E PREVIDÊNCIA ---
@@ -166,12 +206,22 @@ B3_DIVIDEND_UNIVERSE: List[Dict[str, Any]] = [
     {
         "ticker": "SAPR11.SA",
         "ticker_clean": "SAPR11",
-        "name": "Sanepar",
+        "name": "Sanepar Unit",
         "sector": "Utilidade Pública",
         "subsector": "Saneamento",
         "default_category": "bimestral",
         "payout_target": 0.40,
         "description": "Companhia de saneamento do Paraná com múltiplos atrativos de P/L e P/VP abaixo do valor patrimonial, remunerando via JCP."
+    },
+    {
+        "ticker": "SAPR4.SA",
+        "ticker_clean": "SAPR4",
+        "name": "Sanepar PN",
+        "sector": "Utilidade Pública",
+        "subsector": "Saneamento",
+        "default_category": "bimestral",
+        "payout_target": 0.40,
+        "description": "Ações preferenciais da Sanepar negociando abaixo de R$ 6,00, com dividend yield superior a 7,5% e desconto patrimonial expressivo."
     },
     {
         "ticker": "CSMG3.SA",
@@ -210,12 +260,42 @@ B3_DIVIDEND_UNIVERSE: List[Dict[str, Any]] = [
     {
         "ticker": "KLBN11.SA",
         "ticker_clean": "KLBN11",
-        "name": "Klabin",
+        "name": "Klabin Unit",
         "sector": "Materiais Básicos",
         "subsector": "Papel e Celulose / Embalagens",
         "default_category": "trimestral",
         "payout_target": 0.20,
         "description": "Maior produtora e exportadora de papéis para embalagens do Brasil, política formal de dividendos atrelada ao EBITDA desalavancado."
+    },
+    {
+        "ticker": "KLBN4.SA",
+        "ticker_clean": "KLBN4",
+        "name": "Klabin PN",
+        "sector": "Materiais Básicos",
+        "subsector": "Papel e Celulose / Embalagens",
+        "default_category": "trimestral",
+        "payout_target": 0.20,
+        "description": "Ações preferenciais da Klabin cotadas abaixo de R$ 5,00, excelente veículo de acumulação com proventos trimestrais consistentes."
+    },
+    {
+        "ticker": "RANI3.SA",
+        "ticker_clean": "RANI3",
+        "name": "Irani Papel e Embalagens",
+        "sector": "Materiais Básicos",
+        "subsector": "Papel e Embalagens",
+        "default_category": "trimestral",
+        "payout_target": 0.50,
+        "description": "Empresa líder em embalagens sustentáveis de papelão ondulado, cotada abaixo de R$ 10,00, com ROE elevado e política de payout de 50% trimestral."
+    },
+    {
+        "ticker": "CMIG3.SA",
+        "ticker_clean": "CMIG3",
+        "name": "Cemig ON",
+        "sector": "Utilidade Pública",
+        "subsector": "Energia Elétrica",
+        "default_category": "trimestral",
+        "payout_target": 0.50,
+        "description": "Ações ordinárias da Cemig negociadas abaixo de R$ 10,00 com direito a voto e histórico robusto de dividend yield de dois dígitos."
     },
     {
         "ticker": "SUZB3.SA",
@@ -258,6 +338,16 @@ B3_DIVIDEND_UNIVERSE: List[Dict[str, Any]] = [
         "default_category": "trimestral",
         "payout_target": 0.30,
         "description": "Multinacional brasileira de aços longos com forte presença nos EUA e Brasil, histórico disciplinado de dividendos e recompras."
+    },
+    {
+        "ticker": "CSNA3.SA",
+        "ticker_clean": "CSNA3",
+        "name": "CSN (Siderúrgica Nacional)",
+        "sector": "Materiais Básicos",
+        "subsector": "Siderurgia e Mineração",
+        "default_category": "trimestral",
+        "payout_target": 0.40,
+        "description": "Um dos maiores conglomerados siderúrgicos e de mineração do Brasil, forte histórico de proventos e dividend yield em momentos de ciclo de alta."
     },
     {
         "ticker": "VBBR3.SA",

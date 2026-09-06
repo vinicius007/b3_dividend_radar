@@ -62,6 +62,30 @@ FALLBACK_FUNDAMENTALS: Dict[str, Dict[str, Any]] = {
         "lpa": 1.58, "vpa": 7.84, "dividend_cagr_3y": 10.2, "payout": 50.0,
         "payments_per_year": 12, "payment_months": list(range(1, 13))
     },
+    "BEES4.SA": {
+        "price": 10.20, "dpa_12m": 0.90, "dpa_3y_avg": 0.82, "dy_12m": 8.82,
+        "pl": 6.40, "pvp": 1.30, "roe": 19.5, "net_margin": 16.0, "debt_ebitda": 0.0,
+        "lpa": 1.59, "vpa": 7.84, "dividend_cagr_3y": 10.5, "payout": 50.0,
+        "payments_per_year": 12, "payment_months": list(range(1, 13))
+    },
+    "ABCB4.SA": {
+        "price": 24.80, "dpa_12m": 2.15, "dpa_3y_avg": 1.95, "dy_12m": 8.67,
+        "pl": 5.80, "pvp": 0.85, "roe": 15.5, "net_margin": 22.0, "debt_ebitda": 0.0,
+        "lpa": 4.28, "vpa": 29.18, "dividend_cagr_3y": 14.2, "payout": 50.0,
+        "payments_per_year": 4, "payment_months": [1, 4, 7, 10]
+    },
+    "BRSR6.SA": {
+        "price": 13.50, "dpa_12m": 1.18, "dpa_3y_avg": 1.08, "dy_12m": 8.74,
+        "pl": 6.20, "pvp": 0.52, "roe": 9.0, "net_margin": 11.5, "debt_ebitda": 0.0,
+        "lpa": 2.18, "vpa": 25.96, "dividend_cagr_3y": 8.5, "payout": 40.0,
+        "payments_per_year": 4, "payment_months": [3, 6, 9, 12]
+    },
+    "BRAP4.SA": {
+        "price": 19.80, "dpa_12m": 2.10, "dpa_3y_avg": 2.45, "dy_12m": 10.61,
+        "pl": 5.10, "pvp": 0.95, "roe": 18.5, "net_margin": 95.0, "debt_ebitda": -0.1,
+        "lpa": 3.88, "vpa": 20.84, "dividend_cagr_3y": 7.5, "payout": 85.0,
+        "payments_per_year": 4, "payment_months": [4, 5, 11, 12]
+    },
     "BBSE3.SA": {
         "price": 35.60, "dpa_12m": 3.65, "dpa_3y_avg": 3.20, "dy_12m": 10.25,
         "pl": 8.60, "pvp": 5.80, "roe": 68.5, "net_margin": 82.0, "debt_ebitda": -0.5,
@@ -122,11 +146,23 @@ FALLBACK_FUNDAMENTALS: Dict[str, Dict[str, Any]] = {
         "lpa": 4.86, "vpa": 32.04, "dividend_cagr_3y": 12.1, "payout": 40.0,
         "payments_per_year": 6, "payment_months": [2, 4, 6, 8, 10, 12]
     },
+    "SAPR4.SA": {
+        "price": 5.64, "dpa_12m": 0.43, "dpa_3y_avg": 0.39, "dy_12m": 7.62,
+        "pl": 5.80, "pvp": 0.88, "roe": 16.0, "net_margin": 24.0, "debt_ebitda": 1.6,
+        "lpa": 0.97, "vpa": 6.41, "dividend_cagr_3y": 12.1, "payout": 40.0,
+        "payments_per_year": 6, "payment_months": [2, 4, 6, 8, 10, 12]
+    },
     "CSMG3.SA": {
         "price": 21.50, "dpa_12m": 1.92, "dpa_3y_avg": 1.70, "dy_12m": 8.93,
         "pl": 6.90, "pvp": 0.95, "roe": 14.5, "net_margin": 18.0, "debt_ebitda": 1.5,
         "lpa": 3.12, "vpa": 22.63, "dividend_cagr_3y": 11.5, "payout": 50.0,
         "payments_per_year": 4, "payment_months": [3, 6, 9, 12]
+    },
+    "CMIG3.SA": {
+        "price": 9.75, "dpa_12m": 0.95, "dpa_3y_avg": 0.90, "dy_12m": 9.74,
+        "pl": 5.10, "pvp": 0.98, "roe": 20.5, "net_margin": 15.5, "debt_ebitda": 1.3,
+        "lpa": 1.91, "vpa": 9.95, "dividend_cagr_3y": 14.0, "payout": 50.0,
+        "payments_per_year": 4, "payment_months": [4, 6, 9, 12]
     },
     "VIVT3.SA": {
         "price": 52.30, "dpa_12m": 4.10, "dpa_3y_avg": 3.80, "dy_12m": 7.84,
@@ -145,6 +181,18 @@ FALLBACK_FUNDAMENTALS: Dict[str, Dict[str, Any]] = {
         "pl": 8.50, "pvp": 2.30, "roe": 28.0, "net_margin": 15.0, "debt_ebitda": 3.2,
         "lpa": 2.56, "vpa": 9.48, "dividend_cagr_3y": 6.8, "payout": 30.0,
         "payments_per_year": 4, "payment_months": [2, 5, 8, 11]
+    },
+    "KLBN4.SA": {
+        "price": 4.36, "dpa_12m": 0.31, "dpa_3y_avg": 0.30, "dy_12m": 7.11,
+        "pl": 8.50, "pvp": 2.30, "roe": 28.0, "net_margin": 15.0, "debt_ebitda": 3.2,
+        "lpa": 0.51, "vpa": 1.90, "dividend_cagr_3y": 6.8, "payout": 30.0,
+        "payments_per_year": 4, "payment_months": [2, 5, 8, 11]
+    },
+    "RANI3.SA": {
+        "price": 7.65, "dpa_12m": 0.65, "dpa_3y_avg": 0.60, "dy_12m": 8.50,
+        "pl": 6.20, "pvp": 1.45, "roe": 23.5, "net_margin": 18.0, "debt_ebitda": 1.8,
+        "lpa": 1.23, "vpa": 5.28, "dividend_cagr_3y": 14.5, "payout": 50.0,
+        "payments_per_year": 4, "payment_months": [3, 5, 8, 11]
     },
     "SUZB3.SA": {
         "price": 58.40, "dpa_12m": 2.10, "dpa_3y_avg": 1.80, "dy_12m": 3.60,
@@ -169,6 +217,12 @@ FALLBACK_FUNDAMENTALS: Dict[str, Dict[str, Any]] = {
         "pl": 6.40, "pvp": 0.72, "roe": 12.0, "net_margin": 8.0, "debt_ebitda": 0.5,
         "lpa": 2.95, "vpa": 26.25, "dividend_cagr_3y": -2.0, "payout": 30.0,
         "payments_per_year": 4, "payment_months": [3, 5, 8, 11]
+    },
+    "CSNA3.SA": {
+        "price": 12.40, "dpa_12m": 1.15, "dpa_3y_avg": 1.40, "dy_12m": 9.27,
+        "pl": 8.50, "pvp": 0.82, "roe": 10.5, "net_margin": 6.5, "debt_ebitda": 2.8,
+        "lpa": 1.46, "vpa": 15.12, "dividend_cagr_3y": 5.2, "payout": 45.0,
+        "payments_per_year": 4, "payment_months": [4, 5, 11, 12]
     },
     "VBBR3.SA": {
         "price": 24.10, "dpa_12m": 1.65, "dpa_3y_avg": 1.30, "dy_12m": 6.85,

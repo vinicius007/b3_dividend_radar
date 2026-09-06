@@ -6,6 +6,7 @@ Interface inspirada no Power BI com dados fundamentalistas, notícias em tempo r
 import streamlit as st
 import pandas as pd
 import numpy as np
+import textwrap
 from datetime import datetime, date
 
 # Configuração da página Streamlit (Modo Wide executivo)
@@ -26,7 +27,9 @@ from src.ui.components import (
     render_dividend_history_bars,
     render_monthly_calendar_grid,
     render_news_feed,
-    render_passive_income_calculator
+    render_passive_income_calculator,
+    render_top_dividend_yields_section,
+    render_sub_10_bargain_detector
 )
 from src.data.b3_universe import B3_DIVIDEND_UNIVERSE
 from src.engine.recommender import get_ranked_recommendations, get_categorized_portfolios
@@ -36,14 +39,19 @@ from src.data.portfolio_manager import (
     get_portfolio_summary,
     add_transaction,
     delete_transaction,
-    load_transactions
+    load_transactions,
+    get_portfolio_monthly_dividend_alerts,
+    get_portfolio_dip_alerts,
+    MONTH_NAMES
 )
 from src.ui.portfolio_components import (
     render_portfolio_kpis,
     render_pie_invested_chart,
     render_pie_current_value_chart,
     render_bar_profit_loss_chart,
-    render_portfolio_summary_table
+    render_portfolio_summary_table,
+    render_dividend_alerts_section,
+    render_portfolio_dip_alerts
 )
 
 # Injeção de Estilo CSS Power BI
@@ -129,7 +137,7 @@ st.markdown(f"""
     </div>
     <div style="text-align: right;">
         <span class="pbi-badge-live">● MERCADO AO VIVO B3</span>
-        <div style="font-size: 11px; color: #E0F2FE; margin-top: 6px;">Atualizado em: {datetime.now().strftime('%d/%m/%Y %H:%M')}</div>
+        <div style="font-size: 11px; color: #94A3B8; margin-top: 6px;">Atualizado em: {datetime.now().strftime('%d/%m/%Y %H:%M')}</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -141,8 +149,10 @@ st.markdown("<br>", unsafe_allow_html=True)
 # -------------------------------------------------------------
 # NAVEGAÇÃO PRINCIPAL POR ABAS
 # -------------------------------------------------------------
-tab_portfolio, tab_overview, tab_growth, tab_monthly, tab_bimonthly, tab_quarterly, tab_deepdive, tab_news, tab_simulator = st.tabs([
-    "💼 Minha Carteira & Cadastro",
+tab_portfolio, tab_top_yields, tab_sub10, tab_overview, tab_growth, tab_monthly, tab_bimonthly, tab_quarterly, tab_deepdive, tab_news, tab_simulator = st.tabs([
+    "💼 Minha Carteira & Alertas",
+    "💎 Maiores Dividendos B3",
+    "🎯 Ações < R$ 10 (Potencial)",
     "📌 Visão Geral do Mercado",
     "🚀 Potencial de Crescimento",
     "🗓️ Dividendos Mensais",
@@ -154,11 +164,11 @@ tab_portfolio, tab_overview, tab_growth, tab_monthly, tab_bimonthly, tab_quarter
 ])
 
 # -------------------------------------------------------------
-# TAB 0: MINHA CARTEIRA & CADASTRO DE ATIVOS
+# TAB 0: MINHA CARTEIRA & ALERTAS
 # -------------------------------------------------------------
 with tab_portfolio:
-    st.markdown("### 💼 Painel Executivo da Minha Carteira de Ações")
-    st.caption("Acompanhamento de posições reais, rentabilidade a mercado, histórico de lançamentos e cadastro de ativos")
+    st.markdown("### 💼 Painel Executivo da Minha Carteira de Ações & Central de Alertas")
+    st.caption("Acompanhamento de posições reais, rentabilidade a mercado, alertas preditivos de proventos e quedas de preço médio")
 
     # Obter dados consolidados da carteira
     portfolio_summary = get_portfolio_summary(ranked_df)
@@ -167,7 +177,34 @@ with tab_portfolio:
     render_portfolio_kpis(portfolio_summary)
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # 2. Gráficos Solicitados
+    # 🚨 SISTEMA DE ALERTAS 1: PROVENTOS A RECEBER NO MÊS
+    col_alert_hdr, col_month_sel = st.columns([2.5, 1.2])
+    with col_alert_hdr:
+        st.markdown("#### 🚨 1. Alertas de Proventos do Mês")
+        st.caption("Monitor preditivo em tempo real de proventos a receber na conta para os ativos em custódia")
+    with col_month_sel:
+        curr_m = datetime.now().month
+        month_options = list(range(1, 13))
+        selected_alert_month = st.selectbox(
+            "📅 Selecionar Mês de Pagamento:",
+            options=month_options,
+            index=curr_m - 1,
+            format_func=lambda m: f"{MONTH_NAMES.get(m, '')} (Mês {m:02d})",
+            key="portfolio_alert_month_selector"
+        )
+
+    alerts_data = get_portfolio_monthly_dividend_alerts(portfolio_summary, target_month=selected_alert_month)
+    render_dividend_alerts_section(alerts_data)
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # 🔻 SISTEMA DE ALERTAS 2: AÇÕES ABAIXO DO VALOR DE COMPRA (PREÇO < PM)
+    st.markdown("#### 🔻 2. Alertas de Ações Abaixo do Valor de Compra (Preço < PM)")
+    st.caption("Identificação automática de ativos negociados com desconto em relação ao seu preço médio de aquisição")
+    dip_data = get_portfolio_dip_alerts(portfolio_summary, ranked_df)
+    render_portfolio_dip_alerts(dip_data)
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # 3. Gráficos Solicitados
     st.markdown("#### 📊 Visualizações Executivas de Alocação e Rentabilidade")
     
     # Linha com os dois Gráficos Pizza/Donut
@@ -285,7 +322,19 @@ with tab_portfolio:
                         st.rerun()
 
 # -------------------------------------------------------------
-# TAB 1: VISÃO GERAL DO MERCADO
+# TAB 1: MAIORES DIVIDENDOS EM TEMPO REAL
+# -------------------------------------------------------------
+with tab_top_yields:
+    render_top_dividend_yields_section(filtered_df)
+
+# -------------------------------------------------------------
+# TAB 2: DETECTOR DE AÇÕES < R$ 10 (ALTO POTENCIAL)
+# -------------------------------------------------------------
+with tab_sub10:
+    render_sub_10_bargain_detector(ranked_df)
+
+# -------------------------------------------------------------
+# TAB 3: VISÃO GERAL DO MERCADO
 # -------------------------------------------------------------
 with tab_overview:
     col_t1, col_t2 = st.columns([1.6, 1])
@@ -475,20 +524,21 @@ with tab_news:
         )
         sentiment_res = evaluate_company_news_sentiment(live_news)
 
-        st.markdown(f"""
+        sentiment_card_html = f"""
         <div class="pbi-action-card">
-            <div style="font-size:12px; color:#0369A1; font-weight:700;">DIAGNÓSTICO DE SENTIMENTO</div>
+            <div style="font-size:12px; color:#94A3B8; font-weight:700;">DIAGNÓSTICO DE SENTIMENTO</div>
             <div style="font-size:24px; font-weight:800; color:{sentiment_res['color']}; margin: 8px 0;">
                 {sentiment_res['badge']}
             </div>
-            <div style="font-size:13px; color:#334155; line-height:1.4;">
+            <div style="font-size:13px; color:#CBD5E1; line-height:1.4;">
                 {sentiment_res['impact_on_dividends']}
             </div>
             <div style="margin-top:10px; font-size:12px; color:#64748B;">
                 Score de Notícias: <b>{sentiment_res['score']:+.2f}</b> (Escala -1.0 a +1.0)
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """
+        st.markdown(textwrap.dedent(sentiment_card_html).strip(), unsafe_allow_html=True)
 
     with col_n_diag:
         st.markdown(f"#### 🌐 Feed de Notícias em Tempo Real - {selected_news_stock['name']} ({news_ticker})")

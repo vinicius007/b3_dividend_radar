@@ -105,6 +105,87 @@ FALLBACK_NEWS: Dict[str, List[Dict[str, Any]]] = {
             "link": "https://valor.globo.com/empresas/",
             "summary": "Engie conclui novos parques eólicos e solares, mantendo histórico de excelência em dividendos."
         }
+    ],
+    "ABCB4": [
+        {
+            "title": "Banco ABC Brasil (ABCB4) aprova distribuição de dividendos e JCP com ROE acima de 15%",
+            "source": "InfoMoney",
+            "published": "Hoje",
+            "link": "https://www.infomoney.com.br/mercados/",
+            "summary": "Banco ABC mantém expansão de carteira middle-market com baixa inadimplência e proventos regulares."
+        }
+    ],
+    "BRSR6": [
+        {
+            "title": "Banrisul (BRSR6) anuncia pagamento de JCP trimestral e dividend yield segue atrativo",
+            "source": "Money Times",
+            "published": "Hoje",
+            "link": "https://www.moneytimes.com.br/",
+            "summary": "Negociando com desconto sobre valor patrimonial, Banrisul confirma política de remuneração aos acionistas."
+        }
+    ],
+    "BEES4": [
+        {
+            "title": "Banestes (BEES4) mantém calendário de dividendos e JCP mensais aos acionistas preferenciais",
+            "source": "Seu Dinheiro",
+            "published": "Hoje",
+            "link": "https://www.seudinheiro.com/",
+            "summary": "Banco regional do Espírito Santo se consolida entre as melhores pagadoras mensais de proventos da B3."
+        }
+    ],
+    "CSNA3": [
+        {
+            "title": "CSN (CSNA3) reforça foco em geração de caixa e dividendos com expansão na mineração",
+            "source": "Exame Invest",
+            "published": "Hoje",
+            "link": "https://exame.com/invest/",
+            "summary": "Companhia Siderúrgica Nacional destaca rentabilidade operacional em minério de ferro e siderurgia."
+        }
+    ],
+    "BRAP4": [
+        {
+            "title": "Bradespar (BRAP4) distribui proventos bilionários alavancada por fluxo de dividendos da Vale",
+            "source": "InfoMoney",
+            "published": "Hoje",
+            "link": "https://www.infomoney.com.br/mercados/",
+            "summary": "Holding Bradespar repassa geração de caixa robusta com dividend yield de dois dígitos aos acionistas."
+        }
+    ],
+    "SAPR4": [
+        {
+            "title": "Sanepar (SAPR4) aprova distribuição de proventos e mantém múltiplos descontados na B3",
+            "source": "Suno Notícias",
+            "published": "Hoje",
+            "link": "https://www.suno.com.br/noticias/",
+            "summary": "Negociada abaixo de R$ 6,00, Sanepar PN atrai investidores focados em dividendos bimestrais e valuation defensivo."
+        }
+    ],
+    "KLBN4": [
+        {
+            "title": "Klabin (KLBN4) confirma pagamento trimestral de dividendos com estabilidade operacional",
+            "source": "Valor Econômico",
+            "published": "Hoje",
+            "link": "https://valor.globo.com/empresas/",
+            "summary": "Com cotação abaixo de R$ 5,00, ações preferenciais da Klabin reforçam estratégia de acumulação de renda passiva."
+        }
+    ],
+    "RANI3": [
+        {
+            "title": "Irani (RANI3) reporta forte geração de caixa livre e mantém dividend yield elevado de 8%",
+            "source": "Money Times",
+            "published": "Hoje",
+            "link": "https://www.moneytimes.com.br/",
+            "summary": "Fabricante de embalagens sustentáveis se destaca entre as small caps mais rentáveis da bolsa."
+        }
+    ],
+    "CMIG3": [
+        {
+            "title": "Cemig (CMIG3) anuncia cronograma de proventos ordinários com dividend yield atrativo",
+            "source": "InfoMoney",
+            "published": "Hoje",
+            "link": "https://www.infomoney.com.br/mercados/",
+            "summary": "Ações com direito a voto da Cemig negociam abaixo de R$ 10,00 com expressiva remuneração aos acionistas."
+        }
     ]
 }
 
