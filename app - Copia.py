@@ -54,27 +54,6 @@ from src.ui.portfolio_components import (
     render_portfolio_dip_alerts
 )
 
-from login import (
-    verificar_login,
-    logout
-)
-
-# ======================================================
-# LOGIN
-# ======================================================
-
-verificar_login()
-
-# ======================================================
-# MENU USUÁRIO
-# ======================================================
-
-st.sidebar.success(
-    f"👤 {st.session_state.usuario}"
-)
-
-logout()
-
 # Injeção de Estilo CSS Power BI
 st.markdown(POWERBI_CSS, unsafe_allow_html=True)
 
