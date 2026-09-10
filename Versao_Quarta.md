@@ -1,4 +1,4 @@
-Recursos criadosdo Projeto:
+Recursos criados do Projeto:
 
  ✅ Login / Logout
 
