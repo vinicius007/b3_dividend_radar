@@ -29,7 +29,8 @@ from src.ui.components import (
     render_news_feed,
     render_passive_income_calculator,
     render_top_dividend_yields_section,
-    render_sub_10_bargain_detector
+    render_sub_10_bargain_detector,
+    render_market_four_rankings_dashboard
 )
 from src.data.b3_universe import B3_DIVIDEND_UNIVERSE
 from src.engine.recommender import get_ranked_recommendations, get_categorized_portfolios
@@ -42,6 +43,7 @@ from src.data.portfolio_manager import (
     load_transactions,
     get_portfolio_monthly_dividend_alerts,
     get_portfolio_dip_alerts,
+    get_portfolio_dividend_history,
     MONTH_NAMES
 )
 from src.ui.portfolio_components import (
@@ -51,32 +53,52 @@ from src.ui.portfolio_components import (
     render_bar_profit_loss_chart,
     render_portfolio_summary_table,
     render_dividend_alerts_section,
-    render_portfolio_dip_alerts
+    render_portfolio_dip_alerts,
+    render_portfolio_dividend_history_card
 )
-
-from login import (
-    verificar_login,
-    logout
-)
-
-# ======================================================
-# LOGIN
-# ======================================================
-
-verificar_login()
-
-# ======================================================
-# MENU USUÁRIO
-# ======================================================
-
-st.sidebar.success(
-    f"👤 {st.session_state.usuario}"
-)
-
-logout()
 
 # Injeção de Estilo CSS Power BI
 st.markdown(POWERBI_CSS, unsafe_allow_html=True)
+
+# -------------------------------------------------------------
+# AUTENTICAÇÃO COM USUÁRIO E SENHA FIXOS
+# -------------------------------------------------------------
+if "authenticated" not in st.session_state:
+    st.session_state["authenticated"] = False
+
+if not st.session_state["authenticated"]:
+    col_l1, col_l2, col_l3 = st.columns([1, 1.3, 1])
+    with col_l2:
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.markdown(textwrap.dedent("""
+        <div class="pbi-action-card" style="padding: 28px; text-align: center; border-top: 4px solid #38BDF8; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
+            <div style="font-size: 42px; margin-bottom: 8px;">📈</div>
+            <div style="font-size: 22px; font-weight: 800; color: #F8FAFC; letter-spacing: -0.5px;">B3 DIVIDEND RADAR</div>
+            <div style="font-size: 13px; color: #94A3B8; margin-top: 4px;">Plataforma Executiva de Recomendação e Gestão de Proventos</div>
+        </div>
+        """).strip(), unsafe_allow_html=True)
+
+        with st.form("login_form"):
+            st.markdown("##### 🔐 Acesso Restrito ao Sistema")
+            username = st.text_input("Usuário:", placeholder="Digite seu usuário...", value="admin")
+            password = st.text_input("Senha:", type="password", placeholder="Digite sua senha...")
+            login_btn = st.form_submit_button("🚀 Entrar no Sistema", use_container_width=True)
+
+            if login_btn:
+                if (username.strip().lower() in ["admin", "investidor"]) and (password.strip() in ["123", "admin123", "b3dividendos"]):
+                    st.session_state["authenticated"] = True
+                    st.session_state["user"] = username.strip()
+                    st.success("✅ Acesso autorizado com sucesso!")
+                    st.rerun()
+                else:
+                    st.error("❌ Usuário ou senha incorretos. Tente novamente.")
+
+        st.markdown(textwrap.dedent("""
+        <div style="background: rgba(56, 189, 248, 0.1); border: 1px dashed #38BDF8; border-radius: 8px; padding: 12px; margin-top: 15px; font-size: 12px; color: #CBD5E1; text-align: center;">
+            💡 <b>Credenciais de Acesso:</b> Usuário: <code style="color:#38BDF8; font-weight:bold;">admin</code> | Senha: <code style="color:#38BDF8; font-weight:bold;">123</code>
+        </div>
+        """).strip(), unsafe_allow_html=True)
+        st.stop()
 
 # -------------------------------------------------------------
 # CARREGAMENTO DE DADOS COM CACHE
@@ -93,6 +115,15 @@ if "refresh_key" not in st.session_state:
 # SIDEBAR: SLICERS & FILTROS ESTILO POWER BI
 # -------------------------------------------------------------
 with st.sidebar:
+    col_u1, col_u2 = st.columns([2, 1])
+    with col_u1:
+        st.markdown(f"👤 **{st.session_state.get('user', 'admin').upper()}** *(Investidor)*")
+    with col_u2:
+        if st.button("🚪 Sair", key="btn_logout", use_container_width=True):
+            st.session_state["authenticated"] = False
+            st.rerun()
+
+    st.markdown("---")
     st.markdown("### 🎛️ Filtros do Relatório")
     st.caption("Ajuste os parâmetros de triagem da B3")
 
@@ -170,8 +201,9 @@ st.markdown("<br>", unsafe_allow_html=True)
 # -------------------------------------------------------------
 # NAVEGAÇÃO PRINCIPAL POR ABAS
 # -------------------------------------------------------------
-tab_portfolio, tab_top_yields, tab_sub10, tab_overview, tab_growth, tab_monthly, tab_bimonthly, tab_quarterly, tab_deepdive, tab_news, tab_simulator = st.tabs([
+tab_portfolio, tab_rankings4, tab_top_yields, tab_sub10, tab_overview, tab_growth, tab_monthly, tab_bimonthly, tab_quarterly, tab_deepdive, tab_news, tab_simulator = st.tabs([
     "💼 Minha Carteira & Alertas",
+    "🏆 4 Grandes Rankings B3",
     "💎 Maiores Dividendos B3",
     "🎯 Ações < R$ 10 (Potencial)",
     "📌 Visão Geral do Mercado",
@@ -225,7 +257,11 @@ with tab_portfolio:
     render_portfolio_dip_alerts(dip_data)
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # 3. Gráficos Solicitados
+    # 📊 GRÁFICO HISTÓRICO MENSAL DE DIVIDENDOS (CONFORME SOLICITADO)
+    render_portfolio_dividend_history_card(portfolio_summary)
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # 3. Gráficos de Alocação e Rentabilidade
     st.markdown("#### 📊 Visualizações Executivas de Alocação e Rentabilidade")
     
     # Linha com os dois Gráficos Pizza/Donut
@@ -343,7 +379,13 @@ with tab_portfolio:
                         st.rerun()
 
 # -------------------------------------------------------------
-# TAB 1: MAIORES DIVIDENDOS EM TEMPO REAL
+# TAB 1: 4 GRANDES RANKINGS DA B3 (OPORTUNIDADES, DIVIDENDOS, MAIS E MENOS CRESCERAM)
+# -------------------------------------------------------------
+with tab_rankings4:
+    render_market_four_rankings_dashboard(filtered_df)
+
+# -------------------------------------------------------------
+# TAB 2: MAIORES DIVIDENDOS EM TEMPO REAL
 # -------------------------------------------------------------
 with tab_top_yields:
     render_top_dividend_yields_section(filtered_df)

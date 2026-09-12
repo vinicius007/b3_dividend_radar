@@ -680,3 +680,266 @@ def render_sub_10_bargain_detector(market_df: pd.DataFrame):
         use_container_width=True
     )
 
+def render_market_four_rankings_dashboard(ranked_df: pd.DataFrame):
+    """
+    Renderiza o painel executivo dos 4 Grandes Rankings da B3 (conforme layout de referência):
+    1. AS MAIORES OPORTUNIDADES (Maior potencial em relação ao preço justo)
+    2. AS MAIORES PAGADORAS DE DIVIDENDOS (Maior DY 12M e proventos)
+    3. AS QUE MAIS CRESCERAM (Maior crescimento de cotação / CAGR de dividendos)
+    4. AS QUE MENOS CRESCERAM (Menor crescimento / ações mais descontadas da bolsa)
+    """
+    if ranked_df.empty:
+        st.info("Nenhum dado disponível para exibir os rankings.")
+        return
+
+    st.markdown("### 🏆 Grandes Rankings de Ações da B3")
+    st.caption("Selecione um dos 4 pilares estratégicos abaixo para explorar a análise detalhada:")
+
+    # Opções do Ranking
+    ranking_options = [
+        "1. As Maiores Oportunidades",
+        "2. As Maiores Pagadoras de Dividendos",
+        "3. As Que Mais Cresceram",
+        "4. As Que Menos Cresceram"
+    ]
+
+    # Renderizar os 4 cards visuais com estilo da imagem de referência
+    c1, c2, c3, c4 = st.columns(4)
+
+    with c1:
+        st.markdown(textwrap.dedent("""
+        <div class="pbi-action-card" style="border-left: 4px solid #38BDF8; min-height: 110px;">
+            <div style="display: flex; align-items: flex-start; gap: 10px;">
+                <div style="font-size: 22px; line-height: 1;">🥇</div>
+                <div>
+                    <div style="font-size: 14px; font-weight: 800; color: #F8FAFC; line-height: 1.2;">AS MAIORES OPORTUNIDADES</div>
+                    <div style="font-size: 11px; color: #94A3B8; margin-top: 5px; line-height: 1.3;">As ações com maior potencial de crescimento em relação ao preço justo.</div>
+                </div>
+            </div>
+        </div>
+        """).strip(), unsafe_allow_html=True)
+
+    with c2:
+        st.markdown(textwrap.dedent("""
+        <div class="pbi-action-card" style="border-left: 4px solid #10B981; min-height: 110px;">
+            <div style="display: flex; align-items: flex-start; gap: 10px;">
+                <div style="font-size: 22px; line-height: 1;">💰</div>
+                <div>
+                    <div style="font-size: 14px; font-weight: 800; color: #F8FAFC; line-height: 1.2;">AS MAIORES PAGADORAS DE DIVIDENDOS</div>
+                    <div style="font-size: 11px; color: #94A3B8; margin-top: 5px; line-height: 1.3;">As ações que mais pagaram dividendos nos últimos 12 meses.</div>
+                </div>
+            </div>
+        </div>
+        """).strip(), unsafe_allow_html=True)
+
+    with c3:
+        st.markdown(textwrap.dedent("""
+        <div class="pbi-action-card" style="border-left: 4px solid #F59E0B; min-height: 110px;">
+            <div style="display: flex; align-items: flex-start; gap: 10px;">
+                <div style="font-size: 22px; line-height: 1;">🚀</div>
+                <div>
+                    <div style="font-size: 14px; font-weight: 800; color: #F8FAFC; line-height: 1.2;">AS QUE MAIS CRESCERAM</div>
+                    <div style="font-size: 11px; color: #94A3B8; margin-top: 5px; line-height: 1.3;">As ações com maior crescimento da sua cotação e proventos.</div>
+                </div>
+            </div>
+        </div>
+        """).strip(), unsafe_allow_html=True)
+
+    with c4:
+        st.markdown(textwrap.dedent("""
+        <div class="pbi-action-card" style="border-left: 4px solid #818CF8; min-height: 110px;">
+            <div style="display: flex; align-items: flex-start; gap: 10px;">
+                <div style="font-size: 22px; line-height: 1;">🛡️</div>
+                <div>
+                    <div style="font-size: 14px; font-weight: 800; color: #F8FAFC; line-height: 1.2;">AS QUE MENOS CRESCERAM</div>
+                    <div style="font-size: 11px; color: #94A3B8; margin-top: 5px; line-height: 1.3;">As ações com menor crescimento da sua cotação (mais descontadas).</div>
+                </div>
+            </div>
+        </div>
+        """).strip(), unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    selected_rank = st.radio(
+        "Selecione a categoria para visualização aprofundada:",
+        ranking_options,
+        horizontal=True,
+        key="selected_market_rank_tab"
+    )
+
+    st.markdown("---")
+
+    # 1. AS MAIORES OPORTUNIDADES
+    if "Oportunidades" in selected_rank:
+        st.markdown("#### 🎯 As Maiores Oportunidades (Maior Desconto vs Preço Justo)")
+        st.caption("Ações com maior margem de segurança entre o Preço Justo de Graham e o Preço Teto de Décio Bazin")
+        
+        # Calcular média ponderada das margens de Bazin e Graham
+        df_opp = ranked_df.copy()
+        df_opp["avg_margin_safety"] = (df_opp["bazin_margin_safety"] + df_opp["graham_margin_safety"]) / 2.0
+        df_opp = df_opp.sort_values(by="avg_margin_safety", ascending=False).reset_index(drop=True)
+
+        top_opp = df_opp.iloc[0]
+        k1, k2, k3, k4 = st.columns(4)
+        with k1:
+            st.metric("🏆 Maior Desconto Global", f"{top_opp['ticker_clean']}", f"Margem Graham: {top_opp['graham_margin_safety']:+.1f}%")
+        with k2:
+            st.metric("Teto Bazin Médio", f"R$ {df_opp['bazin_target_price'].head(10).mean():.2f}")
+        with k3:
+            st.metric("Preço Justo Graham Médio", f"R$ {df_opp['graham_fair_value'].head(10).mean():.2f}")
+        with k4:
+            st.metric("Dividend Yield Médio Top 10", f"{df_opp['dy_12m'].head(10).mean():.2f}%")
+
+        # Gráfico de Barras do Upside / Margem de Segurança
+        fig = px.bar(
+            df_opp.head(10).sort_values(by="graham_margin_safety", ascending=True),
+            x="graham_margin_safety",
+            y="ticker_clean",
+            orientation="h",
+            text_auto=".1f",
+            title="Top 10 Ações com Maior Potencial de Crescimento vs Preço Justo Graham (%)",
+            labels={"graham_margin_safety": "Margem de Segurança Graham (%)", "ticker_clean": "Ação"},
+            color="graham_margin_safety",
+            color_continuous_scale="Blues"
+        )
+        fig.update_layout(
+            paper_bgcolor=PLOTLY_POWERBI_THEME["layout"]["paper_bgcolor"],
+            plot_bgcolor=PLOTLY_POWERBI_THEME["layout"]["plot_bgcolor"],
+            font=PLOTLY_POWERBI_THEME["layout"]["font"],
+            height=340,
+            margin={"l": 40, "r": 20, "t": 45, "b": 35}
+        )
+        fig.update_xaxes(gridcolor="#334155")
+        fig.update_yaxes(gridcolor="#334155")
+        st.plotly_chart(fig, use_container_width=True)
+
+        render_matrix_table(df_opp.head(15), "📋 Tabela das 15 Maiores Oportunidades em Relação ao Preço Justo")
+
+    # 2. AS MAIORES PAGADORAS DE DIVIDENDOS
+    elif "Pagadoras" in selected_rank:
+        st.markdown("#### 💰 As Maiores Pagadoras de Dividendos (Últimos 12 Meses)")
+        st.caption("Ranking oficial das empresas que entregaram os maiores proventos aos acionistas")
+        
+        df_div = ranked_df.sort_values(by="dy_12m", ascending=False).reset_index(drop=True)
+        top_div = df_div.iloc[0]
+
+        k1, k2, k3, k4 = st.columns(4)
+        with k1:
+            st.metric("👑 Campeã de Yield", f"{top_div['ticker_clean']}", f"DY 12M: {top_div['dy_12m']:.2f}%")
+        with k2:
+            st.metric("DY Médio Top 10", f"{df_div['dy_12m'].head(10).mean():.2f}%")
+        with k3:
+            st.metric("DPA Médio Top 10", f"R$ {df_div['dpa_12m'].head(10).mean():.2f}")
+        with k4:
+            st.metric("Payout Médio", f"{df_div['payout'].head(10).mean():.1f}%")
+
+        fig = px.bar(
+            df_div.head(10).sort_values(by="dy_12m", ascending=True),
+            x="dy_12m",
+            y="ticker_clean",
+            orientation="h",
+            text_auto=".2f",
+            title="Top 10 Maiores Pagadoras de Dividendos da B3 (Yield %)",
+            labels={"dy_12m": "Dividend Yield 12M (%)", "ticker_clean": "Ação"},
+            color="dy_12m",
+            color_continuous_scale="Greens"
+        )
+        fig.update_layout(
+            paper_bgcolor=PLOTLY_POWERBI_THEME["layout"]["paper_bgcolor"],
+            plot_bgcolor=PLOTLY_POWERBI_THEME["layout"]["plot_bgcolor"],
+            font=PLOTLY_POWERBI_THEME["layout"]["font"],
+            height=340,
+            margin={"l": 40, "r": 20, "t": 45, "b": 35}
+        )
+        fig.update_xaxes(gridcolor="#334155")
+        fig.update_yaxes(gridcolor="#334155")
+        st.plotly_chart(fig, use_container_width=True)
+
+        render_matrix_table(df_div.head(15), "📋 Tabela das 15 Maiores Pagadoras de Dividendos")
+
+    # 3. AS QUE MAIS CRESCERAM
+    elif "Mais Cresceram" in selected_rank:
+        st.markdown("#### 🚀 As Que Mais Cresceram (Expansão de Dividendos & Rentabilidade)")
+        st.caption("Empresas com forte taxa de crescimento de proventos (CAGR 3 anos) e elevado retorno sobre capital (ROE)")
+        
+        df_grow = ranked_df.sort_values(by=["dividend_cagr_3y", "roe"], ascending=[False, False]).reset_index(drop=True)
+        top_grow = df_grow.iloc[0]
+
+        k1, k2, k3, k4 = st.columns(4)
+        with k1:
+            st.metric("⭐ Líder em Crescimento", f"{top_grow['ticker_clean']}", f"CAGR: {top_grow['dividend_cagr_3y']:+.1f}%")
+        with k2:
+            st.metric("CAGR Médio Top 10", f"{df_grow['dividend_cagr_3y'].head(10).mean():.1f}% a.a.")
+        with k3:
+            st.metric("ROE Médio Top 10", f"{df_grow['roe'].head(10).mean():.1f}%")
+        with k4:
+            st.metric("Margem Líquida Média", f"{df_grow['net_margin'].head(10).mean():.1f}%")
+
+        fig = px.bar(
+            df_grow.head(10).sort_values(by="dividend_cagr_3y", ascending=True),
+            x="dividend_cagr_3y",
+            y="ticker_clean",
+            orientation="h",
+            text_auto=".1f",
+            title="Top 10 Ações com Maior Crescimento Anualizado de Proventos (CAGR 3 Anos %)",
+            labels={"dividend_cagr_3y": "CAGR de Proventos 3Y (%)", "ticker_clean": "Ação"},
+            color="dividend_cagr_3y",
+            color_continuous_scale="YlOrRd"
+        )
+        fig.update_layout(
+            paper_bgcolor=PLOTLY_POWERBI_THEME["layout"]["paper_bgcolor"],
+            plot_bgcolor=PLOTLY_POWERBI_THEME["layout"]["plot_bgcolor"],
+            font=PLOTLY_POWERBI_THEME["layout"]["font"],
+            height=340,
+            margin={"l": 40, "r": 20, "t": 45, "b": 35}
+        )
+        fig.update_xaxes(gridcolor="#334155")
+        fig.update_yaxes(gridcolor="#334155")
+        st.plotly_chart(fig, use_container_width=True)
+
+        render_matrix_table(df_grow.head(15), "📋 Tabela das 15 Ações com Maior Crescimento de Dividendos e Lucros")
+
+    # 4. AS QUE MENOS CRESCERAM
+    else:
+        st.markdown("#### 🛡️ As Que Menos Cresceram (Mais Descontadas / Menor Preço)")
+        st.caption("Ações negociadas com os menores múltiplos de valuation (menor P/L e menor P/VP), com grande potencial de valorização acumulada")
+        
+        # Ordenar por menor P/L e menor P/VP
+        df_value = ranked_df[ranked_df["pl"] > 0].copy().sort_values(by=["pl", "pvp"], ascending=[True, True]).reset_index(drop=True)
+        top_val = df_value.iloc[0]
+
+        k1, k2, k3, k4 = st.columns(4)
+        with k1:
+            st.metric("💎 Menor P/L da B3", f"{top_val['ticker_clean']}", f"P/L: {top_val['pl']:.1f}x")
+        with k2:
+            st.metric("P/L Médio do Grupo", f"{df_value['pl'].head(10).mean():.1f}x")
+        with k3:
+            st.metric("P/VP Médio do Grupo", f"{df_value['pvp'].head(10).mean():.2f}x")
+        with k4:
+            st.metric("Yield Médio deste Grupo", f"{df_value['dy_12m'].head(10).mean():.2f}%")
+
+        fig = px.bar(
+            df_value.head(10).sort_values(by="pl", ascending=False),
+            x="pl",
+            y="ticker_clean",
+            orientation="h",
+            text_auto=".1f",
+            title="Top 10 Ações Mais Baratas por Preço sobre Lucro (Menor P/L)",
+            labels={"pl": "Preço / Lucro (P/L)", "ticker_clean": "Ação"},
+            color="pl",
+            color_continuous_scale="Purples_r"
+        )
+        fig.update_layout(
+            paper_bgcolor=PLOTLY_POWERBI_THEME["layout"]["paper_bgcolor"],
+            plot_bgcolor=PLOTLY_POWERBI_THEME["layout"]["plot_bgcolor"],
+            font=PLOTLY_POWERBI_THEME["layout"]["font"],
+            height=340,
+            margin={"l": 40, "r": 20, "t": 45, "b": 35}
+        )
+        fig.update_xaxes(gridcolor="#334155")
+        fig.update_yaxes(gridcolor="#334155")
+        st.plotly_chart(fig, use_container_width=True)
+
+        render_matrix_table(df_value.head(15), "📋 Tabela das 15 Ações com Menor Crescimento de Cotação (Deep Value)")
+
+

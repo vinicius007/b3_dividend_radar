@@ -16,7 +16,8 @@ from src.data.portfolio_manager import (
     load_transactions,
     add_transaction,
     delete_transaction,
-    get_portfolio_summary
+    get_portfolio_summary,
+    get_portfolio_dividend_history
 )
 
 def render_portfolio_kpis(summary: Dict[str, Any]):
@@ -464,4 +465,151 @@ def render_portfolio_dip_alerts(dip_data: Dict[str, Any]):
             </div>
             """
             st.markdown(textwrap.dedent(card_html).strip(), unsafe_allow_html=True)
+
+def render_portfolio_dividend_history_card(portfolio_summary: Dict[str, Any]):
+    """
+    Renderiza o componente executivo 'Histórico: Dividendos' exatamente conforme layout de referência.
+    Inclui gráfico de barras mensais com valores no topo, legenda Ações/Meta, médias e totais do período.
+    """
+    # Header do Card com seletor de período e meta
+    col_hdr_title, col_hdr_ctrl = st.columns([2.0, 1.4])
+    with col_hdr_title:
+        st.markdown(textwrap.dedent("""
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
+            <span style="font-size: 20px; font-weight: 800; color: #F8FAFC; letter-spacing: -0.3px;">📊 Histórico: Dividendos</span>
+            <span style="color: #2DD4BF; font-size: 18px; font-weight: 800;">&rsaquo;</span>
+        </div>
+        <div style="font-size: 12px; color: #94A3B8; margin-bottom: 8px;">
+            Evolução mensal dos proventos recebidos na carteira com comparativo de meta
+        </div>
+        """).strip(), unsafe_allow_html=True)
+    with col_hdr_ctrl:
+        c_period, c_goal = st.columns([1.1, 1.1])
+        with c_period:
+            period_choice = st.selectbox("Período:", ["6 Meses", "12 Meses", "Ano Atual (YTD)"], index=0, key="hist_div_period")
+        with c_goal:
+            meta_input = st.number_input("Meta (R$):", min_value=100.0, max_value=100000.0, value=2000.0, step=250.0, format="%.0f", key="hist_div_goal")
+
+    p_type = "6m" if period_choice == "6 Meses" else ("12m" if period_choice == "12 Meses" else "ytd")
+    history_data = get_portfolio_dividend_history(portfolio_summary, period_type=p_type, meta_goal=float(meta_input))
+
+    month_codes = history_data.get("month_codes", [])
+    values = history_data.get("values", [])
+    total_val = history_data.get("total_period", 0.0)
+    avg_val = history_data.get("avg_monthly", 0.0)
+    months_count = history_data.get("months_count", 6)
+    meta_goal_str = history_data.get("meta_goal_str", "2.000")
+    meta_val = history_data.get("meta_goal", 2000.0)
+
+    # Formatação BR com vírgula
+    total_formatted = f"{total_val:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    avg_formatted = f"{avg_val:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+    # Criar gráfico de barras Plotly com estilo idêntico à imagem
+    max_val = max(values) if values and max(values) > 0 else 100.0
+    bar_texts = [f"{v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") if v > 0 else "0,00" for v in values]
+
+    fig = go.Figure()
+
+    # Barra Verde Menta Vibrante / Esmeralda (#00D084 ou #10B981)
+    fig.add_trace(go.Bar(
+        x=month_codes,
+        y=values,
+        name="Ações",
+        marker=dict(
+            color="#00D084",
+            line=dict(color="#00D084", width=1),
+            cornerradius=5
+        ),
+        text=bar_texts,
+        textposition="outside",
+        textfont=dict(size=13, color="#F8FAFC", family="Inter, Segoe UI, sans-serif"),
+        hovertemplate="<b>%{x}</b><br>Proventos Recebidos: R$ %{y:,.2f}<extra></extra>"
+    ))
+
+    # Linha tracejada da Meta se aplicável
+    if meta_val <= max_val * 1.6:
+        fig.add_hline(
+            y=meta_val,
+            line_dash="dot",
+            line_color="#64748B",
+            line_width=1.5,
+            annotation_text=f"Meta {meta_goal_str}",
+            annotation_position="top right",
+            annotation_font=dict(size=10, color="#94A3B8")
+        )
+
+    y_upper = max(max_val * 1.25, 100.0)
+
+    fig.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="#94A3B8", size=12, family="Inter, Segoe UI, sans-serif"),
+        margin=dict(l=35, r=20, t=35, b=15),
+        height=330,
+        showlegend=False,
+        xaxis=dict(
+            showgrid=False,
+            tickfont=dict(size=12, color="#CBD5E1", weight="bold"),
+            linecolor="#334155",
+            showline=True
+        ),
+        yaxis=dict(
+            showgrid=True,
+            gridcolor="#334155",
+            gridwidth=1,
+            tickfont=dict(size=11, color="#94A3B8"),
+            zeroline=True,
+            zerolinecolor="#475569",
+            range=[0, y_upper]
+        )
+    )
+
+    st.markdown('<div class="pbi-chart-container" style="padding: 16px 20px; border-radius: 12px; margin-bottom: 16px;">', unsafe_allow_html=True)
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Rodapé do Gráfico com Legenda e Métricas Consolidadas (conforme imagem)
+    bottom_footer_html = f"""
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 4px; padding-top: 12px; border-top: 1px solid #1E293B; flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="display: inline-block; width: 14px; height: 14px; background: #00D084; border-radius: 3px;"></span>
+                <span style="font-size: 13px; color: #CBD5E1; font-weight: 600;">Ações</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="display: inline-block; width: 14px; height: 14px; background: #64748B; border-radius: 3px;"></span>
+                <span style="font-size: 13px; color: #94A3B8; font-weight: 500;">Meta {meta_goal_str}</span>
+            </div>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-size: 14px; color: #CBD5E1; font-weight: 600;">
+                Média {months_count} meses: <b style="color: #F8FAFC;">R$ {avg_formatted}</b>
+            </div>
+            <div style="font-size: 14px; color: #CBD5E1; font-weight: 600; margin-top: 2px;">
+                Total no período: <b style="color: #F8FAFC;">R$ {total_formatted}</b> <span title="Soma total de proventos (dividendos e JCP) recebidos pela carteira no período selecionado" style="color: #38BDF8; cursor: pointer; font-size: 13px;">ℹ️</span>
+            </div>
+        </div>
+    </div>
+    <div style="font-size: 11px; color: #64748B; margin-top: 10px; font-style: italic;">
+        * Histórico de pagamentos de proventos em R$
+    </div>
+    """
+    st.markdown(textwrap.dedent(bottom_footer_html).strip(), unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # Detalhamento expansível
+    with st.expander("🔍 Ver Detalhamento dos Proventos por Mês"):
+        months_data = history_data.get("months_data", [])
+        m_cols = st.columns(min(6, max(1, len(months_data))))
+        for idx, m_item in enumerate(months_data):
+            col_target = m_cols[idx % len(m_cols)]
+            with col_target:
+                st.markdown(f"**{m_item['month_code']} ({m_item['month_full']})**")
+                st.markdown(f"<span style='color:#00D084; font-weight:700; font-size:15px;'>R$ {m_item['value']:,.2f}</span>", unsafe_allow_html=True)
+                if m_item.get("breakdown"):
+                    for b in m_item["breakdown"]:
+                        st.caption(f"• **{b['ticker']}**: R$ {b['amount']:,.2f}")
+                else:
+                    st.caption("Sem lançamentos")
+
 
