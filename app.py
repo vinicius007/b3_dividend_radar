@@ -80,12 +80,12 @@ if not st.session_state["authenticated"]:
 
         with st.form("login_form"):
             st.markdown("##### 🔐 Acesso Restrito ao Sistema")
-            username = st.text_input("Usuário:", placeholder="Digite seu usuário...", value="admin")
+            username = st.text_input("Usuário:", placeholder="Digite seu usuário...", value="masterradar")
             password = st.text_input("Senha:", type="password", placeholder="Digite sua senha...")
             login_btn = st.form_submit_button("🚀 Entrar no Sistema", use_container_width=True)
 
             if login_btn:
-                if (username.strip().lower() in ["admin", "investidor"]) and (password.strip() in ["123", "admin123", "b3dividendos"]):
+                if (username.strip().lower() in ["masterradar", "investidor"]) and (password.strip() in ["@Blm1975", "admin123", "b3dividendos"]):
                     st.session_state["authenticated"] = True
                     st.session_state["user"] = username.strip()
                     st.success("✅ Acesso autorizado com sucesso!")
@@ -95,7 +95,7 @@ if not st.session_state["authenticated"]:
 
         st.markdown(textwrap.dedent("""
         <div style="background: rgba(56, 189, 248, 0.1); border: 1px dashed #38BDF8; border-radius: 8px; padding: 12px; margin-top: 15px; font-size: 12px; color: #CBD5E1; text-align: center;">
-            💡 <b>Credenciais de Acesso:</b> Usuário: <code style="color:#38BDF8; font-weight:bold;">admin</code> | Senha: <code style="color:#38BDF8; font-weight:bold;">123</code>
+            💡 <b>Credenciais de Acesso:</b> Usuário: <code style="color:#38BDF8; font-weight:bold;">admin</code> | Senha: <code style="color:#38BDF8; font-weight:bold;">@Blm1975</code>
         </div>
         """).strip(), unsafe_allow_html=True)
         st.stop()
